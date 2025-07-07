@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Pokédex</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 2em;
+            }
+            
+            .pokemon-info {
+                text-align: center;
+                padding: 2em;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                max-width: 300px;
+                margin: 0 auto;
+                background-color: #f9f9f9;
+            }
+
+            .pokemon-info img {
+                max-width: 200px;
+            }
+
+            .pokemon-info h2 {
+                font-size: 1.5em;
+                margin-bottom: 0.5em;
+            }
+
+            .pokemon-info div {
+                font-size: 1.1em;
+                margin: 0.5em 0;
+            }
+
+            .pokemon-info strong {
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Pokédex</h1>
+        <input id="pokename" placeholder="Enter Pokémon name" />
+        <button onclick="fetchPokemon()">Search</button>
+        <div id="pokemon-info" class="pokemon-info"></div>
+
+        <script>
+            async function fetchPokemon() {
+                const name = document.getElementById('pokename').value;
+                const infoDiv = document.getElementById('pokemon-info');
+                infoDiv.innerHTML = 'Loading...';
+
+                try {
+                    const res = await fetch(`http://localhost:3000/pokemon/${name}`);
+                    if (!res.ok) throw new Error('Pokémon not found');
+                    
+                    const data = await res.json();
+
+                    infoDiv.innerHTML = `
+                        <h2>${data.name.charAt(0).toUpperCase() + data.name.slice(1)} (#${data.id})</h2>
+                        <img src="${data.image}" alt="${data.name}" style="max-width: 200px;"/>
+                        <div><strong>Height:</strong> ${data.height} centimeters</div>
+                        <div><strong>Weight:</strong> ${data.weight} kilograms</div>
+                        <div><strong>Types:</strong> ${data.types.join(', ')}</div>
+                        <div><strong>Moves:</strong> ${data.moves.slice(0, 10).join(', ')}${data.moves.length > 10 ? ', ...' : ''}</div>
+                    `;
+                } catch (error) {
+                    infoDiv.innerHTML = error.message;
+                }
+            }
+        </script>
+    </body>
+</html>
+<!-- Start the server with: node index.js and open http://localhost:3000 in your browser. -->
